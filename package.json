@@ -15,7 +15,7 @@
   "author": "Aditya",
   "license": "MIT",
   "dependencies": {
-    "@trylocal/local.db": "^1.0.0",
+    "@trylocal/local.db": "github:try-Local/LocalDB#main",
     "express": "^4.17.1"
   }
 }

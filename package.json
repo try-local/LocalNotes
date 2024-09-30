@@ -1,0 +1,21 @@
+{
+  "name": "@trylocal/local.notes",
+  "version": "1.0.0",
+  "description": "Local notes management system with frontend.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "build": "npm run build --prefix public"
+  },
+  "keywords": [
+    "notes",
+    "management",
+    "local"
+  ],
+  "author": "Aditya",
+  "license": "MIT",
+  "dependencies": {
+    "@trylocal/local.db": "^1.0.0",
+    "express": "^4.17.1"
+  }
+}

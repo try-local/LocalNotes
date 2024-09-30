@@ -9,10 +9,11 @@
 <body>
     <div class="container">
         <h1>Local Notes</h1>
-        <input type="text" id="noteInput" placeholder="Add a new note...">
-        <input type="text" id="noteTag" placeholder="Add a tag...">
+        <input type="text" id="noteTitle" placeholder="Note Title..." />
+        <input type="text" id="noteContent" placeholder="Note Content..." />
+        <input type="text" id="noteTag" placeholder="Tag (optional)" />
         <button id="addNoteButton">Add Note</button>
-        <input type="text" id="searchInput" placeholder="Search notes..." oninput="loadNotes()">
+        <input type="text" id="searchBar" placeholder="Search notes..." oninput="filterNotes()" />
         <ul id="notesList"></ul>
     </div>
     <script src="js/app.js"></script>

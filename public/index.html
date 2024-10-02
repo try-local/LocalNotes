@@ -40,8 +40,9 @@
     <!-- Add Note Modal -->
     <div id="note-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 class="text-2xl font-bold mb-4">Add New Note</h2>
+            <h2 class="text-2xl font-bold mb-4">Add/Edit Note</h2>
             <form id="note-form">
+                <input type="hidden" id="note-id"> <!-- Hidden field to store the note ID -->
                 <div class="mb-4">
                     <label for="note-title" class="block text-lg">Title</label>
                     <input type="text" id="note-title" class="w-full p-2 border rounded-lg" required>

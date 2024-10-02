@@ -1,149 +1,148 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const addNoteForm = document.getElementById('add-note-form');
+document.addEventListener('DOMContentLoaded', async () => {
     const notesGrid = document.getElementById('notes-grid');
-    const searchBar = document.getElementById('search-bar');
+    const addNoteBtn = document.getElementById('add-note-btn');
+    const noteModal = document.getElementById('note-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const noteForm = document.getElementById('note-form');
     const themeToggle = document.getElementById('theme-toggle');
-    let notes = [];
 
-    // Fetch all notes
+    // Show modal
+    addNoteBtn.addEventListener('click', () => {
+        noteModal.classList.remove('hidden');
+    });
+
+    // Hide modal
+    closeModalBtn.addEventListener('click', () => {
+        noteModal.classList.add('hidden');
+    });
+
+    // Fetch notes from the backend
     async function fetchNotes() {
-        const res = await fetch('/api/notes');
-        notes = await res.json();
-        renderNotes(notes);
-        updateAnalytics(notes);
+        try {
+            const response = await fetch('/api/notes');
+            const notes = await response.json();
+            renderNotes(notes);
+        } catch (error) {
+            console.error('Error fetching notes:', error);
+        }
     }
 
-    // Render notes to the DOM
+    // Render notes on the dashboard
     function renderNotes(notes) {
-        notesGrid.innerHTML = ''; // Clear current notes
+        notesGrid.innerHTML = '';
         notes.forEach(note => {
-            const noteCard = `
-                <div class="note-card bg-white shadow-md p-4 rounded-lg draggable" draggable="true" data-id="${note.id}">
-                    <input type="text" class="note-title font-bold text-lg" value="${note.title}" onchange="editNoteTitle(${note.id}, this.value)">
-                    <textarea class="note-content text-gray-600" onblur="editNoteContent(${note.id}, this.value)">${note.content}</textarea>
-                    <span class="note-tag text-sm text-blue-500">${note.tag}</span>
-                    <button onclick="deleteNote(${note.id})" class="mt-2 bg-red-500 text-white p-1 rounded">Delete</button>
-                </div>
+            const noteElement = document.createElement('div');
+            noteElement.classList.add('note-card', 'bg-white', 'p-6', 'rounded-lg', 'shadow-lg');
+            noteElement.setAttribute('draggable', true); // Enable dragging
+            noteElement.setAttribute('data-id', note.id); // Store note ID for editing
+            noteElement.addEventListener('dragstart', dragStart);
+            noteElement.addEventListener('click', () => editNote(note));
+
+            noteElement.innerHTML = `
+                <h3 class="text-xl font-bold mb-2">${note.title}</h3>
+                <p class="text-gray-600 mb-4">${note.content}</p>
+                <span class="text-sm bg-blue-200 text-blue-600 rounded-full px-2 py-1">${note.tag || 'General'}</span>
             `;
-            notesGrid.insertAdjacentHTML('beforeend', noteCard);
+            notesGrid.appendChild(noteElement);
         });
-        enableDragAndDrop();
     }
 
-    // Add a new note
-    addNoteForm.addEventListener('submit', async (e) => {
+    // Handle form submission for adding a new note
+    noteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('note-title').value;
         const content = document.getElementById('note-content').value;
         const tag = document.getElementById('note-tag').value;
+
+        try {
+            await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, content, tag }),
+            });
+            noteModal.classList.add('hidden');
+            fetchNotes();  // Refresh the notes after adding a new one
+        } catch (error) {
+            console.error('Error adding note:', error);
+        }
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const noteCards = document.querySelectorAll('.note-card');
+        noteCards.forEach(card => {
+            const title = card.querySelector('h3').innerText.toLowerCase();
+            card.style.display = title.includes(searchTerm) ? 'block' : 'none';
+        });
+    });
+
+    // Drag and drop functionality
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function dragStart(event) {
+        event.dataTransfer.setData('text/plain', event.target.dataset.id);
+    }
+
+    notesGrid.addEventListener('drop', async (event) => {
+        event.preventDefault();
+        const noteId = event.dataTransfer.getData('text/plain');
+        const targetNote = event.target.closest('.note-card');
         
-        const res = await fetch('/api/notes', {
-            method: 'POST',
-            body: JSON.stringify({ title, content, tag }),
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (res.ok) {
-            fetchNotes();  // Re-fetch notes
-        }
-    });
+        if (targetNote && targetNote.dataset.id !== noteId) {
+            // Swap notes if dropped on a different note
+            const draggedNote = document.querySelector(`.note-card[data-id='${noteId}']`);
+            const notes = Array.from(notesGrid.children);
+            const targetIndex = notes.indexOf(targetNote);
+            const draggedIndex = notes.indexOf(draggedNote);
 
-    // Search notes in real time
-    searchBar.addEventListener('input', function() {
-        const query = this.value.toLowerCase();
-        const filteredNotes = notes.filter(note => note.title.toLowerCase().includes(query));
-        renderNotes(filteredNotes);
-    });
-
-    // Edit note title in place
-    window.editNoteTitle = async function(noteId, newTitle) {
-        const note = notes.find(n => n.id === noteId);
-        if (note) {
-            note.title = newTitle;
-            await fetch(`/api/notes/${noteId}`, {
-                method: 'PUT',
-                body: JSON.stringify(note),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            fetchNotes();
-        }
-    }
-
-    // Edit note content in place
-    window.editNoteContent = async function(noteId, newContent) {
-        const note = notes.find(n => n.id === noteId);
-        if (note) {
-            note.content = newContent;
-            await fetch(`/api/notes/${noteId}`, {
-                method: 'PUT',
-                body: JSON.stringify(note),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            fetchNotes();
-        }
-    }
-
-    // Delete a note
-    async function deleteNote(noteId) {
-        const res = await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
-        if (res.ok) {
-            fetchNotes();
-        }
-    }
-
-    // Update analytics
-    function updateAnalytics(notes) {
-        document.getElementById('total-notes').textContent = notes.length;
-        const recentNotes = notes.slice(0, 3).map(note => note.title).join(', ');
-        document.getElementById('recent-notes').textContent = recentNotes;
-    }
-
-    // Enable drag-and-drop functionality
-    function enableDragAndDrop() {
-        const draggables = document.querySelectorAll('.draggable');
-        const grid = document.getElementById('notes-grid');
-
-        draggables.forEach(draggable => {
-            draggable.addEventListener('dragstart', () => {
-                draggable.classList.add('dragging');
-            });
-
-            draggable.addEventListener('dragend', () => {
-                draggable.classList.remove('dragging');
-            });
-        });
-
-        grid.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const afterElement = getDragAfterElement(grid, e.clientY);
-            const dragging = document.querySelector('.dragging');
-            if (afterElement == null) {
-                grid.appendChild(dragging);
+            if (draggedIndex < targetIndex) {
+                notesGrid.insertBefore(draggedNote, targetNote.nextSibling);
             } else {
-                grid.insertBefore(dragging, afterElement);
+                notesGrid.insertBefore(draggedNote, targetNote);
             }
-        });
 
-        function getDragAfterElement(container, y) {
-            const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')];
-
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
+            // Update the order in the backend if necessary
+            // await updateNoteOrder(notes.map(note => note.dataset.id));
         }
-    }
-
-    // Theme toggle (dark/light mode)
-    themeToggle.addEventListener('click', () => {
-        const body = document.body;
-        body.classList.toggle('dark-mode');
-        body.classList.toggle('light-mode');
     });
 
-    fetchNotes(); // Initial fetch
+    // Theme toggle
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Edit note functionality
+    async function editNote(note) {
+        document.getElementById('note-title').value = note.title;
+        document.getElementById('note-content').value = note.content;
+        document.getElementById('note-tag').value = note.tag;
+        noteModal.classList.remove('hidden');
+
+        // Update the note on submission
+        noteForm.onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                await fetch(`/api/notes/${note.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title: note.title, content: note.content, tag: note.tag }),
+                });
+                noteModal.classList.add('hidden');
+                fetchNotes(); // Refresh notes after editing
+            } catch (error) {
+                console.error('Error updating note:', error);
+            }
+        };
+    }
+
+    // Initial fetch of notes
+    fetchNotes();
 });

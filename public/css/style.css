@@ -9,3 +9,12 @@ body {
 #notes-grid .note-card:hover {
     transform: scale(1.05);
 }
+
+#note-modal {
+    transition: opacity 0.3s ease;
+}
+
+#note-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}

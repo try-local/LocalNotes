@@ -5,10 +5,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closeModalBtn = document.getElementById('close-modal-btn');
     const noteForm = document.getElementById('note-form');
     const themeToggle = document.getElementById('theme-toggle');
+    const collapseSidebar = document.getElementById('collapse-sidebar');
+    const sidebar = document.getElementById('sidebar');
+
+    let editingNoteId = null; // Store the ID of the note being edited
 
     // Show modal
     addNoteBtn.addEventListener('click', () => {
         noteModal.classList.remove('hidden');
+        editingNoteId = null; // Reset on new note
     });
 
     // Hide modal
@@ -36,14 +41,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             noteElement.setAttribute('draggable', true); // Enable dragging
             noteElement.setAttribute('data-id', note.id); // Store note ID for editing
             noteElement.addEventListener('dragstart', dragStart);
-            noteElement.addEventListener('click', () => editNote(note));
-
             noteElement.innerHTML = `
                 <h3 class="text-xl font-bold mb-2">${note.title}</h3>
                 <p class="text-gray-600 mb-4">${note.content}</p>
                 <span class="text-sm bg-blue-200 text-blue-600 rounded-full px-2 py-1">${note.tag || 'General'}</span>
+                <button class="mt-4 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700 delete-btn">Delete</button>
             `;
             notesGrid.appendChild(noteElement);
+
+            // Add delete functionality
+            noteElement.querySelector('.delete-btn').addEventListener('click', () => deleteNote(note.id));
+            noteElement.addEventListener('click', () => editNote(note)); // Edit note on click
         });
     }
 
@@ -55,17 +63,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tag = document.getElementById('note-tag').value;
 
         try {
-            await fetch('/api/notes', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ title, content, tag }),
-            });
+            if (editingNoteId) {
+                // Update the existing note
+                await fetch(`/api/notes/${editingNoteId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, content, tag }),
+                });
+            } else {
+                // Add a new note
+                await fetch('/api/notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, content, tag }),
+                });
+            }
             noteModal.classList.add('hidden');
-            fetchNotes();  // Refresh the notes after adding a new one
+            fetchNotes();  // Refresh the notes after adding or editing
         } catch (error) {
-            console.error('Error adding note:', error);
+            console.error('Error saving note:', error);
         }
     });
 
@@ -75,73 +95,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         const searchTerm = e.target.value.toLowerCase();
         const noteCards = document.querySelectorAll('.note-card');
         noteCards.forEach(card => {
-            const title = card.querySelector('h3').innerText.toLowerCase();
+            const title = card.querySelector('h3').textContent.toLowerCase();
             card.style.display = title.includes(searchTerm) ? 'block' : 'none';
         });
     });
 
     // Drag and drop functionality
+    let draggedNote = null;
+
+    function dragStart(event) {
+        draggedNote = event.target;
+        event.dataTransfer.effectAllowed = 'move';
+    }
+
     function allowDrop(event) {
         event.preventDefault();
     }
 
-    function dragStart(event) {
-        event.dataTransfer.setData('text/plain', event.target.dataset.id);
-    }
-
-    notesGrid.addEventListener('drop', async (event) => {
+    function drop(event) {
         event.preventDefault();
-        const noteId = event.dataTransfer.getData('text/plain');
-        const targetNote = event.target.closest('.note-card');
-        
-        if (targetNote && targetNote.dataset.id !== noteId) {
-            // Swap notes if dropped on a different note
-            const draggedNote = document.querySelector(`.note-card[data-id='${noteId}']`);
-            const notes = Array.from(notesGrid.children);
-            const targetIndex = notes.indexOf(targetNote);
-            const draggedIndex = notes.indexOf(draggedNote);
+        if (event.target.classList.contains('note-card')) {
+            const targetNote = event.target;
+            const notes = [...notesGrid.children];
 
-            if (draggedIndex < targetIndex) {
-                notesGrid.insertBefore(draggedNote, targetNote.nextSibling);
-            } else {
+            if (draggedNote !== targetNote) {
                 notesGrid.insertBefore(draggedNote, targetNote);
             }
-
-            // Update the order in the backend if necessary
-            // await updateNoteOrder(notes.map(note => note.dataset.id));
+        } else {
+            notesGrid.appendChild(draggedNote);
         }
-    });
+        // Optionally update order on the backend
+        // await updateNoteOrder([...notesGrid.children].map(note => note.dataset.id));
+    }
+
+    // Delete a note
+    async function deleteNote(noteId) {
+        const confirmDelete = confirm('Are you sure you want to delete this note?');
+        if (confirmDelete) {
+            try {
+                await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
+                fetchNotes(); // Refresh notes after deletion
+            } catch (error) {
+                console.error('Error deleting note:', error);
+            }
+        }
+    }
+
+    // Edit a note
+    async function editNote(note) {
+        document.getElementById('note-title').value = note.title;
+        document.getElementById('note-content').value = note.content;
+        document.getElementById('note-tag').value = note.tag;
+        noteModal.classList.remove('hidden');
+        editingNoteId = note.id; // Set the editing note ID
+    }
 
     // Theme toggle
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
     });
 
-    // Edit note functionality
-    async function editNote(note) {
-        document.getElementById('note-title').value = note.title;
-        document.getElementById('note-content').value = note.content;
-        document.getElementById('note-tag').value = note.tag;
-        noteModal.classList.remove('hidden');
-
-        // Update the note on submission
-        noteForm.onsubmit = async (e) => {
-            e.preventDefault();
-            try {
-                await fetch(`/api/notes/${note.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ title: note.title, content: note.content, tag: note.tag }),
-                });
-                noteModal.classList.add('hidden');
-                fetchNotes(); // Refresh notes after editing
-            } catch (error) {
-                console.error('Error updating note:', error);
-            }
-        };
-    }
+    // Collapse sidebar
+    collapseSidebar.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+    });
 
     // Initial fetch of notes
     fetchNotes();

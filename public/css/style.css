@@ -1,0 +1,11 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+#notes-grid .note-card {
+    transition: transform 0.2s ease;
+}
+
+#notes-grid .note-card:hover {
+    transform: scale(1.05);
+}

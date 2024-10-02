@@ -1,5 +1,19 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const notesGrid = document.getElementById('notes-grid');
+    const addNoteBtn = document.getElementById('add-note-btn');
+    const noteModal = document.getElementById('note-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const noteForm = document.getElementById('note-form');
+
+    // Show modal
+    addNoteBtn.addEventListener('click', () => {
+        noteModal.classList.remove('hidden');
+    });
+
+    // Hide modal
+    closeModalBtn.addEventListener('click', () => {
+        noteModal.classList.add('hidden');
+    });
 
     // Fetch notes from the backend
     async function fetchNotes() {
@@ -28,6 +42,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Handle form submission for adding a new note
+    noteForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('note-title').value;
+        const content = document.getElementById('note-content').value;
+        const tag = document.getElementById('note-tag').value;
+
+        try {
+            await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, content, tag }),
+            });
+            noteModal.classList.add('hidden');
+            fetchNotes();  // Refresh the notes after adding a new one
+        } catch (error) {
+            console.error('Error adding note:', error);
+        }
+    });
+
     // Search functionality
     const searchInput = document.getElementById('search');
     searchInput.addEventListener('input', (e) => {
@@ -39,6 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Initial fetch
+    // Initial fetch of notes
     fetchNotes();
 });

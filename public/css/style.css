@@ -1,3 +1,37 @@
+@import "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
+
+/* Dark and light mode styling */
+body.light-mode {
+    background-color: #f4f4f4;
+    color: #333;
+}
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+.light-mode .bg-gray-800 {
+    background-color: #f4f4f4;
+    color: #333;
+}
+.dark-mode .bg-gray-800 {
+    background-color: #333;
+    color: #fff;
+}
+
+input, button {
+    outline: none;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Styles for the drag-and-drop note elements */
+.draggable {
+    cursor: move;
+}
+
 body {
     font-family: 'Inter', sans-serif;
 }

@@ -23,13 +23,13 @@
 
     <!-- Main Content -->
     <div class="flex-1 p-8">
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex justify-center mb-8">
             <h1 class="text-4xl font-bold">Your Notes</h1>
-            <div class="flex space-x-4">
-                <input type="text" id="search" class="border rounded p-2" placeholder="Search notes...">
-                <button id="add-note-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Note</button>
-            </div>
         </header>
+        <div class="flex justify-between mb-4">
+            <input type="text" id="search" class="border rounded p-2" placeholder="Search notes...">
+            <button id="add-note-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Note</button>
+        </div>
 
         <!-- Notes Grid -->
         <div id="notes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" ondrop="drop(event)" ondragover="allowDrop(event)">

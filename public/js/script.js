@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addNoteBtn.addEventListener('click', () => {
         noteModal.classList.remove('hidden');
         editingNoteId = null; // Reset on new note
+        noteForm.reset(); // Clear form fields
     });
 
     // Hide modal
@@ -124,8 +125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             notesGrid.appendChild(draggedNote);
         }
-        // Optionally update order on the backend
-        // await updateNoteOrder([...notesGrid.children].map(note => note.dataset.id));
     }
 
     // Delete a note

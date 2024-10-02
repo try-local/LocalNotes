@@ -4,40 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Local Notes</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="light-mode">
-    <!-- Header with search bar, theme toggle, and profile settings -->
-    <header class="flex justify-between items-center p-4 bg-gray-800 text-white">
-        <h1 class="text-xl">Notes Dashboard</h1>
-        <div class="flex items-center space-x-4">
-            <input type="text" placeholder="Search Notes" id="search-bar" class="px-4 py-2 rounded-md">
-            <button id="theme-toggle" class="bg-gray-600 p-2 rounded-full">Toggle Theme</button>
-            <button class="bg-gray-600 p-2 rounded-full">Profile</button>
+<body class="bg-gray-100 dark:bg-gray-900">
+
+    <!-- Sidebar -->
+    <div class="flex h-screen">
+        <nav class="bg-gray-800 text-white w-64 p-6 flex flex-col">
+            <h2 class="text-2xl font-bold mb-8">Dashboard</h2>
+            <ul class="space-y-4">
+                <li><a href="#" class="hover:text-blue-400">Notes</a></li>
+                <li><a href="#" class="hover:text-blue-400">Categories</a></li>
+                <li><a href="#" class="hover:text-blue-400">Settings</a></li>
+            </ul>
+            <button id="theme-toggle" class="mt-auto bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Toggle Theme</button>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <header class="flex justify-between items-center mb-8">
+                <h1 class="text-4xl font-bold">Your Notes</h1>
+                <div class="flex space-x-4">
+                    <input type="text" id="search" class="border rounded p-2" placeholder="Search notes...">
+                    <button id="add-note-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Note</button>
+                </div>
+            </header>
+
+            <!-- Notes Grid -->
+            <div id="notes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <!-- Notes will be dynamically added here -->
+            </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Add new note form -->
-    <section class="p-4">
-        <form id="add-note-form" class="flex space-x-4">
-            <input type="text" id="note-title" placeholder="Note Title" class="p-2 rounded-md">
-            <input type="text" id="note-content" placeholder="Note Content" class="p-2 rounded-md">
-            <input type="text" id="note-tag" placeholder="Tag" class="p-2 rounded-md">
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded-md">Add Note</button>
-        </form>
-    </section>
+    <!-- Add Note Modal -->
+    <div id="note-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 class="text-2xl font-bold mb-4">Add New Note</h2>
+            <form id="note-form">
+                <div class="mb-4">
+                    <label for="note-title" class="block text-lg">Title</label>
+                    <input type="text" id="note-title" class="w-full p-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label for="note-content" class="block text-lg">Content</label>
+                    <textarea id="note-content" class="w-full p-2 border rounded-lg" rows="5" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="note-tag" class="block text-lg">Tag</label>
+                    <input type="text" id="note-tag" class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="close-modal-btn" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- Notes overview grid with drag-and-drop support -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4" id="notes-grid">
-        <!-- Note cards will be injected here via JS -->
-    </section>
-
-    <!-- Analytics Section -->
-    <section class="p-4 bg-gray-200">
-        <h3>Total Notes: <span id="total-notes"></span></h3>
-        <h3>Recent Notes: <span id="recent-notes"></span></h3>
-    </section>
-
-    <script src="./js/script.js"></script>
+    <script src="/js/script.js"></script>
 </body>
 </html>

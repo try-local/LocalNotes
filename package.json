@@ -1,5 +1,5 @@
 {
-  "name": "@trylocal/local.notes",
+  "name": "@try-local/local.notes",
   "version": "1.0.0",
   "description": "Local notes management system with frontend.",
   "main": "src/index.js",
@@ -17,5 +17,14 @@
   "dependencies": {
     "@trylocal/local.db": "github:try-Local/LocalDB#main",
     "express": "^4.17.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/try-local/LocalNotes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/try-local/LocalNotes/issues"
+  },
+  "homepage": "https://github.com/try-local/LocalNotes#readme"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@try-local/local.notes",
+  "name": "@trylocal/local.notes",
   "version": "1.0.0",
   "description": "Local notes management system with frontend.",
   "main": "src/index.js",

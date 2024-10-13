@@ -16,9 +16,9 @@
   "license": "MIT",
   "dependencies": {
     "@trylocal/local.db": "github:try-Local/LocalDB#main",
+    "@trylocal/local.themes": "github:try-local/LocalThemes",
     "express": "^4.17.1"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/try-local/LocalNotes.git"

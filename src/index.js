@@ -1,11 +1,12 @@
 const express = require('express');
 const path = require('path');
 const LocalDB = require('@trylocal/local.db');
+const LocalThemes = require('@trylocal/local.themes');
 
 const app = express();
 const db = new LocalDB();
 
-// Middleware to parse JSON bodies
+// Middleware to parse JSON bodies and serve static files
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -47,6 +48,15 @@ app.delete('/api/notes/:id', async (req, res) => {
         res.status(204).send();
     } catch (err) {
         res.status(500).json({ error: 'Failed to delete note.' });
+    }
+});
+
+app.get('/api/themes', (req, res) => {
+    try {
+        const themes = LocalThemes.getAllThemes(); // Fetch themes from package
+        res.json(themes);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to retrieve themes.' });
     }
 });
 

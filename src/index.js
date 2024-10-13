@@ -51,12 +51,16 @@ app.delete('/api/notes/:id', async (req, res) => {
     }
 });
 
-app.get('/api/themes', (req, res) => {
+app.get('/api/themes/:name', (req, res) => {
     try {
-        const themes = LocalThemes.getAllThemes(); // Fetch themes from package
-        res.json(themes);
+        const themes = LocalThemes.getAllThemes();  // Get all themes
+        const theme = themes.find(t => t.name === req.params.name);  // Find the theme by name
+        if (!theme) {
+            return res.status(404).json({ error: 'Theme not found.' });
+        }
+        res.json(theme);  // Return the theme data including the CSS URL
     } catch (err) {
-        res.status(500).json({ error: 'Failed to retrieve themes.' });
+        res.status(500).json({ error: 'Failed to retrieve theme.' });
     }
 });
 

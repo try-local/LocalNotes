@@ -51,6 +51,18 @@ app.delete('/api/notes/:id', async (req, res) => {
     }
 });
 
+app.get('/api/themes', (req, res) => {
+    try {
+        const themes = LocalThemes.getAllThemes(); // Fetch themes from the LocalThemes package
+        if (!themes) {
+            return res.status(404).json({ error: 'No themes available.' });
+        }
+        res.json(themes);  // Return the list of themes
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to retrieve themes.' });
+    }
+});
+
 app.get('/api/themes/:name', (req, res) => {
     try {
         const themes = LocalThemes.getAllThemes();  // Get all themes

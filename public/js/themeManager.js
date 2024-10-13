@@ -39,10 +39,11 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(themes => {
                 const themesList = document.getElementById('themes-list');
+                themesList.innerHTML = '';  // Clear the list before rendering
                 themes.forEach(theme => {
                     const themeCard = document.createElement('div');
                     themeCard.classList.add('bg-gray-200', 'dark:bg-gray-700', 'p-4', 'rounded-lg', 'shadow-lg', 'text-center');
-
+    
                     themeCard.innerHTML = `
                         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">${theme.name}</h3>
                         <img src="${theme.imageUrl}" alt="${theme.name}" class="w-full h-32 object-cover rounded-lg mb-4">
@@ -51,12 +52,12 @@ document.addEventListener("DOMContentLoaded", function() {
                             Select Theme
                         </button>
                     `;
-
+    
                     themesList.appendChild(themeCard);
                 });
             })
             .catch(err => console.error('Failed to load themes:', err));
-    }
+    }    
 
     // Function to apply the selected theme
     function applyTheme(themeName) {

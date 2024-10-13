@@ -63,18 +63,16 @@ document.addEventListener("DOMContentLoaded", function() {
 // Function to apply the selected theme
 function applyTheme(themeName) {
     const themeCSS = document.getElementById('theme-css');
-    
-    // Fetch theme data from the API based on the theme name
     fetch('/api/themes/' + themeName)
-        .then(response => response.json())
-        .then(themeData => {
-            if (themeData.cssUrl) {
-                themeCSS.href = themeData.cssUrl;  // Apply the theme CSS
-                document.body.classList.toggle('dark', themeName === 'dark');
-                localStorage.setItem('theme', themeName);
-            } else {
-                console.error('Theme CSS URL is missing');
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
+            return response.json();
+        })
+        .then(themeData => {
+            themeCSS.href = themeData.cssUrl; // Ensure this URL is accessible
+            localStorage.setItem('theme', themeName);
         })
         .catch(err => console.error('Failed to load theme:', err));
 }

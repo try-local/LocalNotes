@@ -60,29 +60,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }    
 
     // Function to apply the selected theme
-    function applyTheme(themeName) {
-        const themeCSS = document.getElementById('theme-css');
-        fetch(`/api/themes/${themeName}`)  // Fetch the theme data by name
-            .then(response => response.json())
-            .then(themeData => {
-                if (!themeCSS) {
-                    // Create a new <link> element if it doesn't exist
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.id = 'theme-css';
-                    link.href = themeData.cssUrl;
-                    document.head.appendChild(link);
-                } else {
-                    // Update the href if the <link> already exists
-                    themeCSS.href = themeData.cssUrl;
-                }
+// Function to apply the selected theme
+function applyTheme(themeName) {
+    const themeCSS = document.getElementById('theme-css');
     
-                // Apply dark mode class if necessary
+    // Fetch theme data from the API based on the theme name
+    fetch('/api/themes/' + themeName)
+        .then(response => response.json())
+        .then(themeData => {
+            if (themeData.cssUrl) {
+                themeCSS.href = themeData.cssUrl;  // Apply the theme CSS
                 document.body.classList.toggle('dark', themeName === 'dark');
                 localStorage.setItem('theme', themeName);
-            })
-            .catch(err => console.error('Failed to load theme:', err));
-    }    
+            } else {
+                console.error('Theme CSS URL is missing');
+            }
+        })
+        .catch(err => console.error('Failed to load theme:', err));
+}
 
     // Collapse sidebar functionality
     const collapseBtn = document.getElementById('collapse-sidebar');

@@ -63,16 +63,18 @@ app.get('/api/themes', (req, res) => {
     }
 });
 
+// Add a new route to fetch a theme by name
 app.get('/api/themes/:name', (req, res) => {
-    try {
-        const themes = LocalThemes.getAllThemes();  // Get all themes
-        const theme = themes.find(t => t.name === req.params.name);  // Find the theme by name
-        if (!theme) {
-            return res.status(404).json({ error: 'Theme not found.' });
-        }
-        res.json(theme);  // Return the theme data including the CSS URL
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to retrieve theme.' });
+    const themeName = req.params.name;
+    const themes = LocalThemes.getAllThemes(); // Assuming this fetches all available themes
+
+    // Find the theme by name
+    const theme = themes.find(t => t.name === themeName);
+    
+    if (theme) {
+        res.json(theme);  // Return the theme data (including cssUrl)
+    } else {
+        res.status(404).json({ error: 'Theme not found' });
     }
 });
 

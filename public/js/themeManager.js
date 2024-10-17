@@ -70,7 +70,8 @@ function applyTheme(themeName) {
             return response.json();
         })
         .then(themeData => {
-            themeCSS.href = themeData.cssUrl;  // Ensure this URL is correct
+            // Ensure this URL is correct and the CSS file exists
+            themeCSS.href = themeData.cssUrl;
             localStorage.setItem('theme', themeName);
         })
         .catch(err => console.error('Failed to load theme:', err));

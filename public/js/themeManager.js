@@ -70,12 +70,12 @@ function applyTheme(themeName) {
             return response.json();
         })
         .then(themeData => {
-            // Ensure this URL is correct and the CSS file exists
-            themeCSS.href = themeData.cssUrl;
+            themeCSS.href = themeData.cssUrl;  // Ensure this URL is correct
             localStorage.setItem('theme', themeName);
         })
         .catch(err => console.error('Failed to load theme:', err));
 }
+
 
     // Collapse sidebar functionality
     const collapseBtn = document.getElementById('collapse-sidebar');

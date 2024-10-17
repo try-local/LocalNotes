@@ -65,13 +65,12 @@ function applyTheme(themeName) {
     fetch('/api/themes/' + themeName)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Theme not found');
+                throw new Error('Theme not found'); // Error being triggered here
             }
             return response.json();
         })
         .then(themeData => {
-            // Ensure this URL is valid and points to the CSS file
-            themeCSS.href = themeData.cssUrl; 
+            themeCSS.href = themeData.cssUrl;  // Ensure this URL is correct
             localStorage.setItem('theme', themeName);
         })
         .catch(err => console.error('Failed to load theme:', err));

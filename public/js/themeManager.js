@@ -59,19 +59,19 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(err => console.error('Failed to load themes:', err));
     }    
 
-    // Function to apply the selected theme
 // Function to apply the selected theme
 function applyTheme(themeName) {
     const themeCSS = document.getElementById('theme-css');
     fetch('/api/themes/' + themeName)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Theme not found');
             }
             return response.json();
         })
         .then(themeData => {
-            themeCSS.href = themeData.cssUrl; // Ensure this URL is accessible
+            // Ensure this URL is valid and points to the CSS file
+            themeCSS.href = themeData.cssUrl; 
             localStorage.setItem('theme', themeName);
         })
         .catch(err => console.error('Failed to load theme:', err));

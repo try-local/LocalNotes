@@ -37,32 +37,10 @@ npm install @trylocal/local.db
 Here's a basic example of how to use LocalNotes in normal node.js project:
 
 ```javascript
-const LocalNotes = require('@trylocal/local.notes');
-const notes = new LocalNotes();
-
-// Create a new note
-notes.addNote('Meeting Notes', 'Discussed project timeline and goals', ['work', 'meeting']);
-
-// Edit an existing note
-notes.editNote(noteId, 'Updated meeting notes with additional tasks');
-
-// Delete a note
-notes.deleteNote(noteId);
-
-// Search for notes by tag
-const searchResults = notes.searchByTag('work');
-console.log(searchResults);
-```
-
----
-
-Want to use website without using normal node.js one? TRY THIS:
-
-```javascript
 const LocalNotes = require("@trylocal/local.notes");
 
 // BOOM! Your website will be open on localhost:3000
-// Make sure you have both packages - local.notes & local.db.
+// Make sure you have both packages - local.notes & local.db
 ```
 
 ## Frontend Integration
